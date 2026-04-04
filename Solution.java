@@ -1,5 +1,8 @@
 import java.util.*;
 import java.util.AbstractMap.SimpleEntry;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.math.*;
 import java.util.stream.*;
 
@@ -7,7 +10,7 @@ import static utils.Utility.log;
  
 public class Solution {
 
-    static int raverse(int i) {
+    static int reverse(int i) {
         var s = new StringBuilder(String.valueOf(i));
         return Integer.parseInt(s.reverse().toString());
     }
@@ -39,22 +42,788 @@ public class Solution {
         }
     }
 
+    /*
+        Queue:
+        available implementations are:
+        - ArrayDequeu<>() (fast)
+        - LinkedList<>()
+        - PriorityQueue<>()
 
-    public static void main(String... args) {
-        /// for IPair use int[]{a, b}
+        Methods:
+        - offer (add new element at last)
+        - poll (remove first element)
+        - peek (get the first element without removing)
 
-        int[][] points = {{10,16},{2,8},{1,6},{7,12}};
 
-        Arrays.sort(points, (int[] a, int[] b) -> a[0]-b[0]);
+        Comparator:
+        Long.compare((long) a, (long) b) 
 
-        int ans=0;
-        for(int i=0; i<points.length;) {
-            int start = points[i][0], end=points[i][1];
-            int j=i+1;
-            
+        TreeMap<K, V>() 
+        - firstEntry()
+        - lastEntry()
+        - map.compute(key, (k, v) -> {function which returns value for the key})
+
+    */
+
+
+    static void bfsMark(int x, int y, char[][] board, char[][] board2) {
+        if (x >= board.length || y >= board[0].length || x<0 || y<0) return;
+        if(board[x][y] == 'O') {
+            board2[x][y] = 'O';
+            bfsMark(x+1, y, board, board2);
+            bfsMark(x-1, y, board, board2);
+            bfsMark(x, y+1, board, board2);
+            bfsMark(x, y-1, board, board2);
+        }
+    }
+
+    static List<List<Integer>> perms = new ArrayList<>();
+    static void permute(int index, int[] candidates, int target, int sum, List<Integer> current) {
+        if(sum >= target) {
+            if (sum == target) perms.add(new ArrayList<>(current));
+            return;
         }
 
+        for(int i=index; i<candidates.length; i++) {
+            current.add(candidates[i]);
+            permute(i, candidates, target, sum+candidates[i], current);
+            current.remove(current.size()-1);
+        }
+    }
 
+    // static long[][] dp = new long[13][(int)1e4+1];
+
+    // static long solve(int ind, int[] coins, int amt) {
+    //     if (ind >= coins.length || amt < 0) {
+    //         return Integer.MAX_VALUE;
+    //     }
+    //     if (amt==0) return 0;
+
+    //     if(dp[ind][amt] != -1) return dp[ind][amt];
+
+    //     long x=1+solve(ind, coins, amt-coins[ind]);
+    //     long y=1+solve(ind+1, coins, amt-coins[ind]);
+    //     long z=solve(ind+1, coins, amt);
+    //     return dp[ind][amt] = Math.min(x, Math.min(y, z));
+    // }
+
+
+    /*
+    [maximum even/odd sum with constraints]
+    static int solve(int[] nums, int ind, int parity) {
+        if (ind >= nums.length) return 0;
+        
+        int ans = solve(nums, ind+1, parity);
+        int newParity = nums[ind]+parity % 2 == 0 ? 0 : 1;
+        if (nums[ind] % 2==0) {
+            ans = Math.max(ans, nums[ind] + solve(nums, ind+1, newParity));
+        } else {
+            ans = Math.max(ans, solve(nums, ind+2, newParity));
+        }
+
+        return ans;
+    }
+    
+    */
+
+
+    // static int[][] dp = new int[2][(int)1e5+1];
+    // static int solve(int ind, int[] nums, int parity) {
+    //     if(ind >= nums.length) {
+    //         return 0;
+    //     }
+
+    //     if(dp[parity][ind] != -1) return dp[parity][ind];
+
+    //     int ans=solve(ind+1, nums, parity);
+    //     if (parity == 0) {
+    //         ans = Math.max(ans, nums[ind]+solve(ind+1, nums, 1));
+    //     } else {
+    //         ans = Math.max(ans, solve(ind+1, nums, 0)-nums[ind]);
+    //     }
+
+    //     return dp[parity][ind] = ans;
+    // }
+
+
+    // static int[] dp = new int[305];
+
+    // static boolean solve(String s, int ind, Set<String> words) {
+    //     if (ind >= s.length()) return true;
+
+    //     if(dp[ind] != -1) {
+    //         return dp[ind] == 1 ? true : false;
+    //     }
+    //     StringBuilder tmp = new StringBuilder();
+    //     boolean possible=false;
+    //     for(int i=ind; i<s.length(); i++) {
+    //         tmp.append(s.charAt(i));
+    //         if (words.contains(tmp.toString())) {
+    //             possible = possible || solve(s, i+1, words);
+    //         }
+    //     }
+    //     dp[ind] = possible ? 1 : 0;
+    //     return possible;
+    // }
+
+    // static int[] dp = new int[2505];
+    // static int solve(int ind, int[] nums) {
+    //     int ans=1;
+    //     if (dp[ind] != -1) return dp[ind];
+    //     for(int i=ind+1; i<nums.length; i++) {
+    //         if (nums[i] > nums[ind]) {
+    //             ans = Math.max(ans, 1+solve(i, nums));
+    //         }
+    //     }
+    //     return dp[ind] = ans;
+    // }
+
+    // static int[][] dp = new int[205][205];
+    // static int solve(int i, int j, List<List<Integer>> triangle) {
+
+    //     if (i==triangle.size()) return 0;
+    //     if(dp[i][j] != -1) return dp[i][j];
+        
+    //     return dp[i][j] = triangle.get(i).get(j) + Math.min(solve(i+1, j, triangle), solve(i+1, j+1, triangle));
+    // }
+
+    // static int solve(int[][] grid, int x, int y, int[][] dp) {
+    //     if(x == grid.length || y == grid[0].length || grid[x][y] == 1) 
+    //         return 0;
+    //     if (x==grid.length-1 && y==grid[0].length-1) 
+    //         return 1;
+    //     if (dp[x][y] != -1) return dp[x][y];
+    //     return dp[x][y] = solve(grid, x+1, y, dp) + solve(grid, x, y+1, dp);
+    // }
+    
+    // static boolean check(String s1, String s2, String s3, int x, int y, int[][] dp) {
+        
+    //     if (x == s1.length() && y == s2.length()) 
+    //         return x+y == s3.length();
+        
+    //     if (dp[x][y] != -1) return dp[x][y] == 1;
+
+    //     boolean ans = false;
+    //     if (x < s1.length() && s1.charAt(x) == s3.charAt(x+y)) 
+    //         ans |= check(s1, s2, s3, x+1, y, dp);
+    //     if (y < s2.length() && s2.charAt(y) == s3.charAt(x+y))
+    //         ans |= check(s1, s2, s3, x, y+1, dp);
+
+    //     dp[x][y] = ans ? 1 : 0;
+    //     return ans;
+    // }
+
+
+    // static int solve(String word1, String word2, int x, int y, int[][] dp) {
+        
+    //     if (x == word1.length()) 
+    //         return y==word2.length() ? 0 : word2.length()-y;
+
+    //     if (y == word2.length()) 
+    //         return 1+ solve(word1, word2, x+1, y, dp);
+
+    //     if (dp[x][y] != -1) return dp[x][y];
+
+    //     int ans=0;
+    //     if(word1.charAt(x) == word2.charAt(y)) {
+    //         ans = solve(word1, word2, x+1, y+1, dp);
+    //     } else {
+    //         // insert
+    //         ans = 1+ solve(word1, word2, x, y+1, dp);
+    //         // replace
+    //         ans = Math.min(ans, 1+solve(word1, word2, x+1, y+1, dp));
+    //         // rem
+    //         ans = Math.min(ans, 1+solve(word1, word2, x+1, y, dp));
+    //     }
+
+    //     return dp[x][y] = ans;
+    // }
+
+    // static int findMin(List<int[]> cnt) {
+    //     return Math.min(cnt.get(0)[0] + cnt.get(1)[1], 
+    //     cnt.get(0)[1] + cnt.get(1)[0]);
+    // }
+
+
+    // static int[][] dp = new int[301][301];
+    // static int find(char[][] mat, int i, int j, int R, int C) {
+    //     if(i >= R || j >= C) return 0;
+        
+    //     if (dp[i][j] != -1) return dp[i][j];
+
+    //     int mini = Math.min(find(mat, i+1, j, R, C), find(mat, i, j+1, R, C));
+    //     mini = Math.min(find(mat, i+1, j+1, R, C), mini);
+
+    //     if (mat[i][j] == '0') return dp[i][j] = 0;
+    //     else return dp[i][j] = 1+mini;
+    // }
+
+    // static int[][][] dp = new int[101][2][1001];
+
+    // static int solve(int ind, int[] prices, int trans, int buy) {
+    //     if (ind == prices.length) return 0;
+
+    //     if (dp[trans][buy][ind] != -1) return dp[trans][buy][ind];
+    //     int ans=solve(ind+1, prices, trans, buy);
+
+    //     if (buy == 1) {
+    //         if (trans > 0) {
+    //             ans = Math.max(ans, solve(ind+1, prices, trans, 0) - prices[ind]);
+    //         }
+    //     } else {
+    //         ans = Math.max(ans, prices[ind] + solve(ind+1, prices, trans-1, 1));
+    //     }
+        
+    //     return dp[trans][buy][ind] = ans;
+    // }
+
+    // static int get(int num) {
+    //     int cnt=0;
+    //     while(num%5==0) {
+    //         num/=5;
+    //         cnt++;
+    //     }
+    //     return cnt;
+    // }
+
+    
+
+    public static void main(String... args) {
+
+        String encoded = " b  ac";
+        int rows=2;
+
+        int len=encoded.length();
+        int col=len/rows;
+        StringBuilder ans=new StringBuilder();
+        for(int i=0; i<col; ++i) {
+            int j=i;
+            while(j<len) {
+                ans.append(encoded.charAt(j));
+                j+=(col+1);
+            }
+        }
+        
+        StringBuilder decoded = new StringBuilder();
+        for(int i=ans.length()-1; i>=0; --i) {
+            if (ans.charAt(i) == ' ') continue;
+            else {
+                while(i >= 0) {
+                    decoded.append(ans.charAt(i--));
+                }
+                break;
+            }   
+        }
+        
+        log(decoded.reverse().toString().length());
+        
+
+        // int[] nums = {3,2,3,1,2,4,5,5,6};
+        // int k=4;
+
+        // Queue<Integer> pq = new PriorityQueue<>();
+        // for(int i: nums) {
+        //     pq.offer(i);
+        //     if (pq.size()>k) {
+        //         pq.poll();
+        //     }
+        // }
+
+        // int ans=pq.poll();
+
+        // int left = 2147483646, right = 2147483647;
+        // int ans=0;
+        // for(long i=30; i>=0; --i) {
+        //     if (((1L << i) & left) > 0) {
+        //         // how many skips required to unset current bit ??
+        //         long p = (long) Math.pow(2, i);
+        //         long rem=(long) left % p;
+        //         if ((long) left + (p-rem) > (long) right) 
+        //             ans |= (1 << i);
+        //     }
+        // }
+
+        // create a executor service using fixed thread pool
+        // ExecutorService executor = Executors.newFixedThreadPool(3);
+        // submit task to run via executor
+        // for(int i=0; i<10; i++) {
+        //     final int x=i;
+        //     executor.submit(() -> {
+        //         System.out.println("Task "+x+ " executed by thread: "+Thread.currentThread().getName());
+        //     });
+        // }
+
+        // // finally
+        // executor.shutdown();
+
+        // CompletableFuture.supplyAsync(() -> {
+        //     return "HI";
+        // })
+        // .whenComplete((res, ex) -> {
+        //     if (ex != null) 
+        //         System.out.println("Exception occurred: "+ ex.getMessage());
+        // })
+        // .thenAccept((s) -> System.out.println(s));
+
+        // executor.shutdown();
+
+        // future.thenAccept((st) -> {
+        //     System.out.println(st);
+        // });
+
+        // future.whenComplete((res, ex) -> {
+        //     if (ex != null) {
+        //         System.out.println("success");
+        //     }
+        // });
+
+        // future.join();
+
+
+        // int n = 10000;
+
+        // int ans=0;
+        // for(int i=n; i>=5; --i) {
+        //     ans += get(i);
+        // }
+        
+        
+        // int[] prices = {3,2,6,5,0,3};
+        // int k=2;
+
+        // for(int i=0; i<101; i++) 
+        //     for(int j=0; j<2; j++) Arrays.fill(dp[i][j], -1);
+
+        // int i=solve(0, prices, k, 1);
+        // log(i);
+
+        // char[][] matrix = {
+        //     {'1','0','1','0','0'},
+        //     {'1','0','1','1','1'},
+        //     {'1','1','1','1','1'},
+        //     {'1','0','0','1','0'}
+        // };
+
+        // for(int i=0; i<301; i++) Arrays.fill(dp[i], -1);
+        // int R=matrix.length, C=matrix[0].length;
+
+        // find(matrix, 0, 0, R, C);
+        
+        // int ans=-1;
+        // for(int i=0; i<301; i++) {
+        //     for(int j=0; j<301; j++) {
+        //         ans = Math.max(ans, dp[i][j]);
+        //     }
+        // }
+
+        // brute -> better/optimal
+
+        // String s = "10001100101000000";
+
+        // int n=s.length();
+        // StringBuilder s1 = new StringBuilder();
+        // StringBuilder s2 = new StringBuilder();
+
+        // for(int i=0; i<2*n; ++i) {
+        //     if (i%2 == 0) {
+        //         s1.append('0');
+        //         s2.append('1');
+        //     } else {
+        //         s1.append('1');
+        //         s2.append('0');
+        //     }
+        // }
+
+        // log(s1);
+        // log(s2);
+        // int ans=0, a1=0, a2=0;
+        // for(int i=0; i<n; ++i) {
+        //     if (s.charAt(i) != s1.charAt(i)) a1++;
+        //     if (s.charAt(i) != s2.charAt(i)) a2++;
+        // }
+
+        // ans = Math.min(a1, a2);
+        // s+=s;
+        // for(int l=0, r=n; r<2*n; ++r) {
+        //     if (s.charAt(r) != s1.charAt(r)) a1++;
+        //     if (s.charAt(r) != s2.charAt(r)) a2++;
+
+        //     if (s.charAt(l) != s1.charAt(l)) --a1;
+        //     if (s.charAt(l) != s2.charAt(l)) --a2;
+        //     ++l;
+
+        //     ans=Math.min(ans, Math.min(a1, a2));
+        // }
+
+        
+        // String word1 = "", word2 = "a";
+
+        // int[][] dp = new int[501][501];
+        // for(int i=0; i<501; i++)
+        //     Arrays.fill(dp[i], -1);
+
+        // int x = solve(word1, word2, 0, 0, dp);
+        // log(x);        
+        // String s = "babad";
+
+        // int ans=0;
+        // StringBuilder palin = new StringBuilder();
+        // for(int i=0; i<s.length(); i++) {
+        //     int l=i, r=i;
+        //     while(l >=0 && r < s.length() && s.charAt(l)==s.charAt(r)) {
+        //         l--;
+        //         r++;
+        //     }
+
+        //     if (r-l-1 > ans) {
+        //         ans = r-l-1;
+        //         palin = new StringBuilder();
+        //         for (int x=l+1; x<r; x++) palin.append(s.charAt(x));
+        //     }
+        //     l=i; 
+        //     r=i+1;
+        //     while(l>=0 && r<s.length() && s.charAt(l) == s.charAt(r)) {
+        //         l--;
+        //         r++;
+        //     }
+        //     if (r-l-1 > ans) {
+        //         ans = r-l-1;
+        //         palin = new StringBuilder();
+        //         for (int x=l+1; x<r; x++) palin.append(s.charAt(x));
+        //     }
+
+        // }
+
+        // int n=4, k=11;
+        // StringBuilder sb = new StringBuilder("0");
+        // n-=1;
+        // while (n-- > 0) {
+        //     int len=sb.length();
+        //     sb.append('1');
+        //     for(int i=len-1; i>=0; --i) {
+        //         if (sb.charAt(i) == '0') 
+        //             sb.append('1');
+        //         else 
+        //             sb.append('0');
+        //     }
+        // }
+
+        // log(sb.toString());
+        // log(sb.charAt(k-1));
+        // int[][] obs = {{0,1},{0,0}};
+        // int[][] dp = new int[205][205];
+        // for(int i=0; i<205; i++)
+        //     Arrays.fill(dp[i], -1);
+        
+        // int x=solve(obs, 0, 0, dp);
+        // log(x);
+
+        // int minValue = Integer.MIN_VALUE;
+        // for(int[] row: grid) {
+        //     int t=row[0];
+        //     for(int i: row) t=Math.min(t, i);
+        //     minValue = Math.max(minValue, t);
+        // }
+
+        // log(minValue);
+        // List<Integer> valuesFromRow = new ArrayList<>();
+
+        // for(int[] row: grid) {
+        //     int mismatch = 18, val=Integer.MAX_VALUE;
+        //     for(int num: row) {
+        //         int curr_mis = 0;
+        //         for(int i=0; i<18; i++) {
+        //             if (((1 << i) & minValue) == 0 && ((1 << i) & num) > 0) {
+        //                 curr_mis++;
+        //             } 
+        //         }
+
+        //         if (curr_mis < mismatch) {
+        //             mismatch = curr_mis;
+        //             val = num;
+        //         }
+        //     }
+
+        //     valuesFromRow.add(val);
+        // }
+        
+        // log(valuesFromRow);
+        // int ans=valuesFromRow.get(0);
+        // for(int i: valuesFromRow) ans |= i;
+        // log(ans);
+        // List<List<Integer>> triangle = Arrays.asList(
+        //     Arrays.asList(2),
+        //     Arrays.asList(3,4),
+        //     Arrays.asList(6,5,7),
+        //     Arrays.asList(4,1,8,3)
+        // );
+
+
+        // int[][] dp = new int[205][205];
+        // Arrays.fill(dp[triangle.size()], 0);
+        // for(int i=triangle.size()-1; i>=0; i--) {
+        //     for(int j=triangle.get(i).size()-1; j>=0; j--) {
+        //         dp[i][j] = triangle.get(i).get(j) + Math.min(dp[i+1][j], dp[i+1][j+1]);
+        //     }
+        // }
+
+        // String s = "abcd";
+        // List<String> wordDict = Arrays.asList("a","abc","b","cd");
+        
+        // boolean[] dp = new boolean[305];
+        // Arrays.fill(dp, false);
+        // Set<String> words = new HashSet<>(wordDict);
+        
+        // dp[s.length()] = dp[s.length()+1] = true;
+        // for(int i=s.length()-1; i>=0; i--) {
+        //     StringBuilder tmp =new StringBuilder();
+        //     for(int ind=i; ind < s.length(); ind++) {
+        //         tmp.append(s.charAt(ind));
+        //         if (words.contains(tmp.toString())) {
+        //             dp[i] = dp[i] || dp[ind+1];
+        //         }
+        //     }
+        // }
+
+        // boolean[] dp = new boolean[305];
+        // dp[s.length()+1] = dp[s.length()] = true;
+        
+        // for(int i=s.length()-1; i>=0; i--) {
+            
+            
+        // }
+
+        
+
+
+
+        // int[] dp = new int[(int)1e5+2];
+        // Arrays.fill(dp, -1);
+
+        // dp[nums.length] = dp[nums.length+1] = 0;
+        // for(int i=nums.length-1; i>=0; i--) {
+        //     dp[i] = dp[i+1];
+        //     dp[i] = Math.max(dp[i], nums[i] + dp[i+2]);
+        // }
+
+        // int[] cnt = new int[]{0, 0};
+        // for(int i=0; i<t.length(); i++) {
+        //     if(t.charAt(i) == '0') cnt[0]++;
+        //     else cnt[1]++;
+        // }
+
+        // StringBuilder ans = new StringBuilder();
+        // for(int i=0; i<s.length(); i++) {
+            
+        //     if(s.charAt(i) == '0' && cnt[1] > 0) {
+        //         ans.append('1');
+        //         cnt[1]--;
+        //     } else if (s.charAt(i)=='1' && cnt[0] > 0) {
+        //         ans.append('0');
+        //         cnt[0]--;
+        //     } else {
+        //         if (cnt[0] > 0) {
+        //             ans.append('0');
+        //             cnt[0]--;
+        //         } else {
+        //             ans.append('1');
+        //             cnt[1]--;
+        //         }
+        //     }
+        // }
+
+        // StringBuilder xor = new StringBuilder();
+        // for(int i=0; i<ans.length(); i++) {
+        //     if (ans.charAt(i) == s.charAt(i)) xor.append('0');
+        //     else xor.append('1');
+        // }
+
+        // int[] nums = {10,1,3,9};
+        // int[] colors = {1,1,1,2};
+
+        // long[] dp = new long[(int)1e5+2];
+        // Queue<Integer> q = new ArrayDeque<>();
+        // PriorityQueue<Integer> pq = new PriorityQueue<>((a, b) -> Long.compare((long) a, (long) b));
+
+
+        // dp[nums.length] = dp[nums.length+1] = 0;
+        // for(int i=nums.length-1; i>=0; i--) {
+        //     dp[i] = dp[i+1];
+        //     if(i < nums.length-1 && colors[i]==colors[i+1]) 
+        //         dp[i] = Math.max(dp[i], nums[i] + dp[i+2]);
+        //     else 
+        //         dp[i] = Math.max(dp[i], nums[i] + dp[i+1]);
+        // }
+
+        /// for IPair use int[]{a, b}
+
+        // int[] nums = {97972481,930598563,314313375,175573412,162190171,219104574,422802583,607950364,592864533,976554265,812497864,680816749,759971788,125263581,87657934,716673807,303336691,71618316,697802577,474649598,373446233,84929297,966011901,774697275,401252862,349443940,541515978,722312906,479444254,439036905,586856629,456283761,486432108,366271311,607068433,567537885,558649446};
+        // long k=32999014233L;
+
+        // TreeMap<Integer, Integer> mp = new TreeMap<>();
+        
+        // long ans=0;
+        // for(int l=0, r=0; r<nums.length; r++) {
+        //     mp.compute(nums[r], (key, v) -> v==null ? 1 : v+1);
+        //     int min=mp.firstKey(), max=mp.lastKey();
+        //     while(l<=r && (long)(max-min)*(long)(r-l+1) > k) {
+        //         if(mp.get(nums[l]) == 1) mp.remove(nums[l]);
+        //         else mp.put(nums[l], mp.get(nums[l])-1);
+        //         l++;
+        //         max=mp.lastKey();
+        //         min=mp.firstKey();
+        //     }
+        //     ans += (r-l+1);
+        // }
+
+        // log(ans);
+
+        // int[] nums = {6,2,1,2,4,5};
+        // int x=5;
+
+        // for(int i=0; i<2; i++) Arrays.fill(dp[i], -1);
+        // long ans=solve(0, nums, 0);
+        
+        // dp[0][nums.length] = 0;
+        // dp[1][nums.length] = 0;
+
+        // for(int ind=nums.length-1; ind>=0; ind--) {
+        //     for(int parity=0; parity<2; parity++) {
+        //         // skipping
+        //         dp[parity][ind] = dp[parity][ind+1];
+        //         if (parity == 0) {
+        //             dp[parity][ind] = Math.max(dp[parity][ind], nums[ind] + dp[1][ind+1]);
+        //         } else {
+        //             dp[parity][ind] = Math.max(dp[parity][ind], dp[0][ind+1] - nums[ind]);
+        //         }
+        //     }
+        // }
+
+        // long ans = dp[0][0];
+        // log(ans);
+        
+        // int[] nums = {1,3,2,5,6,2,9,12,14,11,2,2,3,4};
+        // int eans = solve(nums, 0, 0);
+        // int oans = solve(nums, 0, 1);
+
+        // int[] coins = {357,239,73,52};
+        // int amt=9832;
+        // for(int i=0; i<13; i++) Arrays.fill(dp[i], -1);
+        // long xx = solve(0, coins, amt);
+        // log(xx);
+
+        // int[] candidates = {2,3,6,7};
+        // int target = 7;
+
+        // permute(0, candidates, target, 0, new ArrayList<>());
+        // log(perms);
+
+        // int[][] preq = {{1,0}};
+        // int numCourses=2;
+
+        // int cnt=0;
+        // int[] indeg = new int[numCourses];
+        // Arrays.fill(indeg, 0);
+        // ArrayList<Integer>[] gr = new ArrayList[numCourses];
+        // for(int i=0; i<numCourses; i++) {
+        //     gr[i] = new ArrayList<>();
+        // }
+        // for(int[] i: preq) {
+        //     indeg[i[1]]++;
+        //     gr[i[0]].add(i[1]);
+        // }
+
+        // // kahn's algo for topological sorting
+        // Queue<Integer> q = new ArrayDeque<>();
+        // for(int i=0; i<numCourses; i++) {
+        //     if (indeg[i] == 0) q.offer(i);
+        // }
+        
+        // while(!q.isEmpty()) {
+        //     int u=q.poll();
+        //     cnt++;
+        //     for(int adj: gr[u]) {
+        //         if (--indeg[adj] == 0) q.offer(adj);
+        //     }
+        // }
+
+        // log(cnt);
+
+        // char[][] board = {
+        //     {'X','X','X','X'},
+        //     {'X','O','O','X'},
+        //     {'X','X','O','X'},
+        //     {'X','O','X','X'}
+        // };
+
+
+        // char[][] board2 = board;
+        // for(int i=0; i<board.length; i++) {
+        //     for(int j=0; j<board[0].length; j++) {
+        //         board2[i][j] = 'X';
+        //     }
+        // }
+        
+        // log(board[3][1]);
+
+        // for(int i=0; i<board[0].length; i++) {
+        //     // first row
+        //     if(board[0][i] == 'O') 
+        //         bfsMark(0, i, board, board2);
+        //     // last row
+        //     if(board[board.length-1][i] == 'O') {
+        //         bfsMark(board.length-1, i, board, board2);
+        //         log("last");
+        //     }
+        // }
+
+        // for(int i=0; i<board.length; i++) {
+        //     // first col
+        //     if (board[i][0] == 'O') bfsMark(i, 0, board, board2);
+        //     // last col
+        //     if (board[i][board[0].length-1] == 'O') 
+        //         bfsMark(i, board[0].length-1, board, board2);
+        // }
+        
+        // int islands=0;
+
+        // int R=grid.length, C = grid[0].length;
+        // for(int i=0; i<R; i++) {
+        //     for(int j=0; j<C; j++) {
+        //         if (grid[i][j] == '1') {
+        //             ++islands;
+        //             bfsMark(i, j, grid);
+        //         }
+        //     }
+        // }
+
+        // log(islands);
+
+        // String[] tokens = {"10","6","9","3","+","-11","*","/","*","17","+","5","+"};
+
+        // Stack<Integer> st = new Stack<>();
+        // for(int i=0; i<tokens.length; i++) {
+        //     char ch = tokens[i].charAt(0);
+        //     if (Character.isDigit(ch) || tokens[i].length() > 1) {
+        //         StringBuilder t = new StringBuilder();
+        //         for(int j=0; j<tokens[i].length(); j++) t.append(tokens[i].charAt(j));
+        //         st.push(Integer.parseInt(t.toString()));
+        //     }
+        //     else {
+        //         int a = st.pop();
+        //         int b = st.pop();
+        //         if (ch == '+') st.push(a+b);
+        //         else if(ch == '-') st.push(b-a);
+        //         else if(ch == '*') st.push(a*b);
+        //         else st.push(b/a);
+        //     }
+
+        //     log(st);
+        // }
+
+        // int ans=st.pop();
+        // log(ans);
+        
         // int[][] intervals = {};
         // int[] nw = {6, 8};
     
