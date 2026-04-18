@@ -49,6 +49,45 @@ public class Utility {
         }
     }
 
+    /*
+    first element >= target
+    */
+
+    public static int lowerBound(int[] nums, int target) {
+        int low=0, hi=nums.length-1, mid;
+        while(low <= hi) {
+            mid = low+(hi-low)/2;
+            if (nums[mid] < target) 
+                low=mid+1;
+            else hi=mid-1;
+        }
+
+        return low;
+    }
+    
+    // first element > target
+    public static int upperBound(int[] nums, int target) {
+        int lo=0, hi=nums.length-1, mid;
+        while (lo <= hi) {
+            mid=lo+(hi-lo)/2;
+            if (nums[mid]<=target) 
+                lo=mid+1;
+            else hi=mid-1;
+        }
+        return lo;
+    }
+
+    public static int upperBound(List<Integer> nums, int target) {
+        int lo=0, hi=nums.size()-1, mid;
+        while (lo <= hi) {
+            mid=lo+(hi-lo)/2;
+            if (nums.get(mid)<=target) 
+                lo=mid+1;
+            else hi=mid-1;
+        }
+        return lo;
+    }
+
     public static int nCr(int n, int r) {
         // pascal's triangle
         if (n < r) return 0;
@@ -80,7 +119,7 @@ public class Utility {
     }
 
     public static void log(Object o) {
-        System.out.println("-----------------------");
+        // System.out.println("-----------------------");
         if(o instanceof int[]) {
             Arrays.stream((int[]) o).forEach(i->System.out.print(i+" "));
             System.out.print('\n');
@@ -95,10 +134,31 @@ public class Utility {
                 System.out.print(" "+strings[i]+" ");
             }
             System.out.print("]\n");
-        } 
+        } else if (o instanceof int[][]) {
+            System.out.print("{");
+            int L=((int[][]) o).length;
+            for(int i=0; i<L; ++i) {
+                int[] r=((int[][])o)[i];
+                System.out.print(" { ");
+                Arrays.stream(r).forEach(c -> System.out.print(c+" "));
+                System.out.print("}");
+            }
+            System.out.println(" }");
+        }
+        else if (o instanceof long[][]) {
+            System.out.print('{');
+            int L=((long[][]) o).length;
+            for(int i=0; i<L; ++i) {
+                long[] r=((long[][])o)[i];
+                System.out.print('{');
+                Arrays.stream(r).forEach(c -> System.out.print(c+' '));
+                System.out.println('}');
+            }
+            System.out.println('}');
+        }
         else
             System.out.println(o);
-        System.out.println("-----------------------");
+        // System.out.println("-----------------------");
     }
 
     private static String stringify(Object obj) {

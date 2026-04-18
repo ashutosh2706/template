@@ -6,7 +6,7 @@ public class DSU {
     public DSU(int n) {
         par = new int[n];
         sz = new int[n];
-        Arrays.fill(sz, 1)
+        Arrays.fill(sz, 1);
         for (int i = 0; i < n; i++) {
             par[i] = i;
         }
