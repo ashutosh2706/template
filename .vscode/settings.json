@@ -1,4 +1,5 @@
 {
     "terminal.integrated.defaultProfile.windows": "Command Prompt",
-    "terminal.integrated.defaultLocation": "editor"
+    "workbench.panel.defaultLocation": "right",
+    "terminal.integrated.tabs.defaultColor": "terminal.ansiCyan"
 }
